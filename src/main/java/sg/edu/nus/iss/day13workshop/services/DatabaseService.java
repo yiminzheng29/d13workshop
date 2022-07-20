@@ -1,7 +1,17 @@
 package sg.edu.nus.iss.day13workshop.services;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.Scanner;
 
+import org.springframework.stereotype.Service;
+
+import sg.edu.nus.iss.day13workshop.models.Contact;
+
+@Service
 public class DatabaseService {
     
     private File dataDir = new File("some directory"); // initiating a place to store files in the directory
@@ -20,5 +30,43 @@ public class DatabaseService {
         return dataDir.exists() && dataDir.isDirectory() && dataDir.canWrite();
     }
 
-    
+    public boolean save(final Contact contact) {
+        File f = new File(this.dataDir, contact.getID());
+        try {
+            OutputStream out = new FileOutputStream(f);
+            PrintWriter pw = new PrintWriter(out);
+            pw.println(contact.getID()); // returns ID in the file, if it is inside the file
+            pw.println(contact.getName()); // returns name in the file, if it is inside the file
+            pw.println(contact.getEmail()); // returns email in the file, if it is inside the file
+            pw.println(contact.getPhone()); // returns phone in the file, if it is inside the file
+            pw.flush();
+
+            return true;
+
+        } catch (IOException ex) {
+            System.err.printf("Error: %s", ex.getMessage());
+            // ex.printStackTrace();
+            return false;
+        }
+		
+	}
+
+	public Contact read(String fileID) {
+
+        try {
+            File f = new File(this.dataDir, fileID);
+            Scanner myReader = new Scanner(f);
+            while (myReader.hasNextLine()) {
+                System.out.println(myReader.nextLine());
+            }
+            myReader.close();
+
+            Contact contact = new Contact();
+            return contact;
+        } catch (IOException ex) {
+            System.err.printf("Error: %s", ex.getMessage());
+            ex.printStackTrace();
+            return null;
+        }
+	}
 }
